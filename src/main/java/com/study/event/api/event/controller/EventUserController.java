@@ -24,5 +24,15 @@ public class EventUserController {
         return ResponseEntity.ok().body(isDuplicate);
     }
 
+    // 인증 코드 검증 API
+    @GetMapping("/code")
+    public ResponseEntity<?> verifyCode(String email, String code) {
+
+        log.info("{}'s verify code is [ {} ]", email, code);
+        boolean isMatch = eventUserService.isMatchCode(email, code);
+
+        return ResponseEntity.ok().body(isMatch);
+    }
+
 
 }
