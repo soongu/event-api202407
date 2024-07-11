@@ -1,5 +1,6 @@
 package com.study.event.api.event.service;
 
+import com.study.event.api.event.dto.request.EventUserSaveDto;
 import com.study.event.api.event.entity.EmailVerification;
 import com.study.event.api.event.entity.EventUser;
 import com.study.event.api.event.repository.EmailVerificationRepository;
@@ -149,5 +150,20 @@ public class EventUserService {
 
         }
         return false;
+    }
+
+    // 회원가입 마무리
+    public void confirmSignUp(EventUserSaveDto dto) {
+
+        // 기존 회원 정보 조회
+        EventUser foundUser = eventUserRepository
+                .findByEmail(dto.getEmail())
+                .orElseThrow(
+                        () -> new RuntimeException("회원 정보가 존재하지 않습니다.")
+                );
+
+        // 데이터 반영 (패스워드, 가입시간)
+        foundUser.confirm(dto.getPassword());
+        eventUserRepository.save(foundUser);
     }
 }
