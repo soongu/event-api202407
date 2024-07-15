@@ -242,7 +242,6 @@ public class EventUserService {
                 .role(eventUser.getRole().toString())
                 .token(token)
                 .build();
-
     }
 
 }

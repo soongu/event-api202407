@@ -1,6 +1,7 @@
 package com.study.event.api.auth;
 
 import com.study.event.api.event.entity.EventUser;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -67,5 +68,26 @@ public class TokenProvider {
                 )) // 토큰 만료 시간
                 .setSubject(eventUser.getId()) // 토큰을 식별할수 있는 유일한 값
                 .compact();
+    }
+
+    /**
+     * 클라이언트가 전송한 토큰을 디코딩하여 토큰의 서명 위조 여부를 확인
+     * 그리고 토큰을 JSON으로 파싱하여 안에 들어있는 클레임(토큰 정보)을 리턴
+     * @param token
+     */
+    public void validateAndGetTokenInfo(String token) {
+
+        Claims claims = Jwts.parserBuilder()
+                // 토큰 발급자의 발급 당시 서명을 넣음
+                .setSigningKey(
+                        Keys.hmacShaKeyFor(SECRET_KEY.getBytes())
+                )
+                // 서명위조 검사 진행 : 위조된 경우 Exception이 발생
+                // 위조되지 않은 경우 클레임을 리턴
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        log.info("claims: {}", claims);
     }
 }
