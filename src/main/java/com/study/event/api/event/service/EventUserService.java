@@ -1,7 +1,9 @@
 package com.study.event.api.event.service;
 
+import com.study.event.api.auth.TokenProvider;
 import com.study.event.api.event.dto.request.EventUserSaveDto;
 import com.study.event.api.event.dto.request.LoginRequestDto;
+import com.study.event.api.event.dto.response.LoginResponseDto;
 import com.study.event.api.event.entity.EmailVerification;
 import com.study.event.api.event.entity.EventUser;
 import com.study.event.api.event.repository.EmailVerificationRepository;
@@ -36,6 +38,9 @@ public class EventUserService {
 
     // 패스워드 암호화 객체
     private final PasswordEncoder encoder;
+
+    // 토큰 생성 객체
+    private final TokenProvider tokenProvider;
 
 
     // 이메일 중복확인 처리
@@ -204,7 +209,7 @@ public class EventUserService {
 
 
     // 회원 인증 처리 (login)
-    public void authenticate(final LoginRequestDto dto) {
+    public LoginResponseDto authenticate(final LoginRequestDto dto) {
 
         // 이메일을 통해 회원정보 조회
         EventUser eventUser = eventUserRepository.findByEmail(dto.getEmail())
@@ -226,7 +231,17 @@ public class EventUserService {
         }
 
         // 로그인 성공
-        // 인증정보를 어떻게 관리할 것인가?
+        // 인증정보를 어떻게 관리할 것인가? 세션 or 쿠키 or 토큰
+        // 인증정보(이메일, 닉네임, 프사, 토큰정보)를 클라이언트에게 전송
+
+        // 토큰 생성
+        String token = tokenProvider.createToken(eventUser);
+
+        return LoginResponseDto.builder()
+                .email(eventUser.getEmail())
+                .role(eventUser.getRole().toString())
+                .token(token)
+                .build();
 
     }
 
