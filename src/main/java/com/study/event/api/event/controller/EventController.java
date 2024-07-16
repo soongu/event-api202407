@@ -5,6 +5,7 @@ import com.study.event.api.event.dto.response.EventOneDto;
 import com.study.event.api.event.service.EventService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +38,7 @@ public class EventController {
         Map<String, Object> events = eventService.getEvents(pageNo, sort, userId);
 
         // 의도적으로 2초간의 로딩을 설정
-        Thread.sleep(2000);
+//        Thread.sleep(2000);
 
         return ResponseEntity.ok().body(events);
     }
@@ -50,8 +51,17 @@ public class EventController {
             @RequestBody EventSaveDto dto
     ) {
 
-        eventService.saveEvent(dto, userId);
-        return ResponseEntity.ok().body("event saved!");
+        try {
+            eventService.saveEvent(dto, userId);
+            return ResponseEntity.ok().body("event saved!");
+        } catch (IllegalStateException e) {
+            // 권한에 따른 에러
+            log.warn(e.getMessage());
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(e.getMessage())
+                    ;
+        }
     }
 
     // 단일 조회 요청

@@ -76,7 +76,7 @@ public class TokenProvider {
      * @param token - 클라이언트가 보낸 토큰
      * @return - 토큰에 들어있는 인증 정보들을 리턴 - 회원 식별 ID
      */
-    public String validateAndGetTokenInfo(String token) {
+    public String[] validateAndGetTokenInfo(String token) {
 
         Claims claims = Jwts.parserBuilder()
                 // 토큰 발급자의 발급 당시 서명을 넣음
@@ -92,6 +92,6 @@ public class TokenProvider {
         log.info("claims: {}", claims);
 
         // 토큰에 인증된 회원의 PK
-        return claims.getSubject();
+        return new String[] {claims.getSubject(), claims.get("role", String.class)};
     }
 }

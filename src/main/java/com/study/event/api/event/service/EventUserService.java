@@ -6,6 +6,7 @@ import com.study.event.api.event.dto.request.LoginRequestDto;
 import com.study.event.api.event.dto.response.LoginResponseDto;
 import com.study.event.api.event.entity.EmailVerification;
 import com.study.event.api.event.entity.EventUser;
+import com.study.event.api.event.entity.Role;
 import com.study.event.api.event.repository.EmailVerificationRepository;
 import com.study.event.api.event.repository.EventUserRepository;
 import com.study.event.api.exception.LoginFailException;
@@ -243,5 +244,29 @@ public class EventUserService {
                 .token(token)
                 .build();
     }
+
+    // 등업 처리
+    public LoginResponseDto promoteToPremium(String userId) {
+        EventUser eventUser = eventUserRepository.findById(userId).orElseThrow();
+
+        // 이미 프리미엄이거나 관리자면 예외 발생
+        if (eventUser.getRole() != Role.COMMON) {
+            throw new IllegalStateException("일반 회원만 승격할 수 있습니다.");
+        }
+
+        // 등급 변경
+        eventUser.promoteToPremium();
+        EventUser promotedUser = eventUserRepository.save(eventUser);
+
+        // 토큰을 재발급
+        String token = tokenProvider.createToken(promotedUser);
+
+        return LoginResponseDto.builder()
+                .email(promotedUser.getEmail())
+                .role(promotedUser.getRole().toString())
+                .token(token)
+                .build();
+    }
+
 
 }

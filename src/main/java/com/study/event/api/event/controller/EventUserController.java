@@ -8,6 +8,8 @@ import com.study.event.api.exception.LoginFailException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -63,6 +65,26 @@ public class EventUserController {
             // 서비스에서 예외발생 (로그인 실패)
             String errorMessage = e.getMessage();
             return ResponseEntity.status(422).body(errorMessage);
+        }
+
+    }
+
+    // 일반회원을 프리미엄으로 상승시키는 요청 처리
+    @PutMapping("/promote")
+    public ResponseEntity<?> promote(
+            @AuthenticationPrincipal String userId
+    ) {
+        log.info("/auth/promote PUT! - {}", userId);
+
+        try {
+            LoginResponseDto responseDTO = eventUserService.promoteToPremium(userId);
+            return ResponseEntity.ok().body(responseDTO);
+        } catch (IllegalStateException e) {
+            log.warn(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            log.warn(e.getMessage());
+            return ResponseEntity.internalServerError().body(e.getMessage());
         }
 
     }
