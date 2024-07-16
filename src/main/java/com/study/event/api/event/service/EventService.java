@@ -35,22 +35,17 @@ public class EventService {
 
         Pageable pageable = PageRequest.of(pageNo - 1, 4);
 
-//        Page<Event> eventsPage = eventRepository.findEvents(pageable, sort, userId);
-
-        EventUser eventUser = eventUserRepository.findById(userId).orElseThrow();
-
-        List<Event> events = eventUser.getEventList();
+        Page<Event> eventsPage = eventRepository.findEvents(pageable, sort, userId);
 
         // 이벤트 목록
-//        List<Event> events = eventsPage.getContent();
+        List<Event> events = eventsPage.getContent();
 
         List<EventDetailDto> eventDtoList = events
                 .stream().map(EventDetailDto::new)
                 .collect(Collectors.toList());
 
         // 총 이벤트 개수
-//        long totalElements = eventsPage.getTotalElements();
-        long totalElements = 100;
+        long totalElements = eventsPage.getTotalElements();
 
         Map<String, Object> map = new HashMap<>();
         map.put("events", eventDtoList);

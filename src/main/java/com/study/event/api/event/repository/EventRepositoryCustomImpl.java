@@ -28,6 +28,7 @@ public class EventRepositoryCustomImpl implements EventRepositoryCustom {
         // 페이징을 통한 조회
         List<Event> eventList = factory
                 .selectFrom(event)
+                .where(event.eventUser.id.eq(userId))
                 .orderBy(specifier(sort))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
