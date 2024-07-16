@@ -23,7 +23,7 @@ public class EventRepositoryCustomImpl implements EventRepositoryCustom {
     private final JPAQueryFactory factory;
 
     @Override
-    public Page<Event> findEvents(Pageable pageable, String sort) {
+    public Page<Event> findEvents(Pageable pageable, String sort, String userId) {
 
         // 페이징을 통한 조회
         List<Event> eventList = factory
