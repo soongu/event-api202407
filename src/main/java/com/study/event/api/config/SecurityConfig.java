@@ -52,9 +52,9 @@ public class SecurityConfig {
                 // /events/**  -> 뒤에 여러개
                 .antMatchers(HttpMethod.DELETE, "/events/*").hasAuthority("ADMIN")
 
+                .antMatchers(HttpMethod.PUT, "/auth/promote").hasAuthority("COMMON")
                 // 아래의 URL요청은 로그인 없이 모두 허용
                 .antMatchers("/", "/auth/**").permitAll()
-//                .antMatchers(HttpMethod.POST,"/events/**").hasAnyRole("VIP", "ADMIN")
 
                 // 나머지 요청은 전부 인증(로그인) 후 진행해라
                 .anyRequest().authenticated() // 인가 설정 on
