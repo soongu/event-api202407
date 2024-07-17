@@ -1,5 +1,6 @@
 package com.study.event.api.event.controller;
 
+import com.study.event.api.auth.TokenProvider;
 import com.study.event.api.event.dto.request.EventSaveDto;
 import com.study.event.api.event.dto.response.EventOneDto;
 import com.study.event.api.event.service.EventService;
@@ -10,6 +11,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+
+import static com.study.event.api.auth.TokenProvider.*;
 
 @RestController
 @RequestMapping("/events")
@@ -23,21 +26,21 @@ public class EventController {
     @GetMapping("/page/{pageNo}")
     public ResponseEntity<?> getList(
             // 토큰파싱 결과로 로그인에 성공한 회원의 PK
-             @AuthenticationPrincipal String userId,
+             @AuthenticationPrincipal TokenUserInfo tokenInfo,
              @RequestParam(required = false) String sort,
              @PathVariable int pageNo
     ) throws InterruptedException {
 
-        log.info("token user id : {}", userId);
+        log.info("token info : {}", tokenInfo);
 
         if (sort == null) {
             return ResponseEntity.badRequest().body("sort 파라미터가 없습니다.");
         }
 
-        Map<String, Object> events = eventService.getEvents(pageNo, sort, userId);
+        Map<String, Object> events = eventService.getEvents(pageNo, sort, tokenInfo.getUserId());
 
         // 의도적으로 2초간의 로딩을 설정
-        Thread.sleep(2000);
+//        Thread.sleep(2000);
 
         return ResponseEntity.ok().body(events);
     }
@@ -46,11 +49,11 @@ public class EventController {
     @PostMapping
     public ResponseEntity<?> register(
             // JwtAuthFilter에서 시큐리티에 등록한 데이터
-            @AuthenticationPrincipal String userId,
+            @AuthenticationPrincipal TokenUserInfo userInfo,
             @RequestBody EventSaveDto dto
     ) {
 
-        eventService.saveEvent(dto, userId);
+        eventService.saveEvent(dto, userInfo.getUserId());
         return ResponseEntity.ok().body("event saved!");
     }
 
