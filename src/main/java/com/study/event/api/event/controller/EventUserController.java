@@ -53,6 +53,7 @@ public class EventUserController {
         try {
             eventUserService.confirmSignUp(dto);
         } catch (Exception e) {
+	    // 아마존에서 수정함
             return ResponseEntity.badRequest().body(e.getMessage());
         }
 
