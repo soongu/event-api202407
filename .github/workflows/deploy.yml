@@ -24,6 +24,7 @@ jobs:
 
       - name: Write the application.yml
         run: |
+          pwd
           echo "${{ secrets.APPLICATION_YML }}" > ./src/main/resources/application.yml
 
       - name: Build and push Docker image
