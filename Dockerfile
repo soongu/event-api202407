@@ -11,7 +11,7 @@ COPY . /app
 RUN ./gradlew clean build
 
 # 빌드된 JAR 파일 복사
-RUN cp build/libs/*.jar app.jar
+RUN cp build/libs/event.api-0.0.1-SNAPSHOT.jar app.jar
 
 # 애플리케이션 실행 명령
 CMD ["java", "-jar", "app.jar"]
