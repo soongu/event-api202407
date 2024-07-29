@@ -54,8 +54,12 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            echo "Docker login..."
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
+            echo "Pulling Docker image..."
             sudo docker pull soongu/event-api:latest
-            docker-compose down
-            docker rmi $(docker images -q)
-            docker-compose up -d
+            echo "Stopping existing container..."
+            docker stop event-api-container || true
+            docker rm event-api-container || true
+            echo "Starting new container..."
+            docker run -d -p 80:80 --name event-api-container soongu/event-api:latest
