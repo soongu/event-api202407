@@ -22,6 +22,10 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
+      - name: Write the application.yml
+        run: |
+          echo "${{ secrets.APPLICATION_YML }}" > ./src/main/resources/application.yml
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
         with:
@@ -30,15 +34,14 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/event-api:latest
 
-      - name: Write the application.yml
+      - name: Set up SSH key
+        env:
+          SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
         run: |
-          echo "${{ secrets.APPLICATION_YML }}" > ./src/main/resources/application.yml
-
-      - name: Setup SSH
-        uses: webfactory/ssh-agent@v0.5.2
-        with:
-          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
-
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" | base64 --decode > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-add ~/.ssh/id_rsa
       - name: Deploy to EC2
         run: |
-          ssh -o "StrictHostKeyChecking=no" ec2-user@${{ secrets.EC2_HOST }} "docker pull ${{ secrets.DOCKERHUB_USERNAME }}/event-api:latest && docker-compose up -d"
+          ssh -o "StrictHostKeyChecking=no" ec2-user@${{ secrets.EC2_HOST }} "docker pull ${{ secrets.DOCKERHUB_USERNAME }}/event-api:latest && docker-compose up -d && docker-compose logs"
