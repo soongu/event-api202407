@@ -10,46 +10,52 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
 
-      - name: Login to DockerHub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Make directory for deliver
+        run: mkdir deploy
 
       - name: Write the application.yml
         run: |
-          pwd
           echo "${{ secrets.APPLICATION_YML }}" > ./src/main/resources/application.yml
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/event-api:latest
+      - name: Build with Gradle
+        run: ./gradlew clean build
 
-      - name: Deploy
+      - name: Copy jar
+        run: cp ./build/libs/*.jar ./deploy/
+
+        # 도커 컴포즈 설정 파일 서버로 전달하기(복사 후 붙여넣기)
+      - name: Send docker-compose.yml
+        uses: appleboy/scp-action@master
+        with:
+          username: ec2-user
+          host: ${{ secrets.EC2_HOST }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "./docker-compose.yml"
+          target: "/home/ec2-user/"
+
+      ## springboot 도커 이미지 빌드 후 도커허브에 push하기
+      - name: web springboot docker build and push
+        run: |
+          docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
+          docker build -t soongu/event-api:latest .
+          docker push soongu/event-api:latest
+
+      # 도커 허브에서 jar파일 및 pull후에 컴포즈 up
+      - name: Deploy to Dev
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.EC2_HOST }} # EC2 인스턴스 퍼블릭 DNS
           username: ec2-user
-          key: ${{ secrets.EC2_SSH_KEY }} # pem 키
+          host: ${{ secrets.EC2_HOST }}
+          key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            echo "change permission"
-            sudo su
-            echo "print working directory"
-            pwd
-            echo "git pulling"
-            git pull origin main 
-            echo "docker-compose down"
+            docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
+            sudo docker pull sonngu/event-api:latest
             docker-compose down
-            echo "docker-compose up"
-            docker-compose up -d --build
-
+            docker rmi $(docker images -q)
+            docker-compose up -d
