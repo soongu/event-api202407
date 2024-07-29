@@ -41,8 +41,14 @@ jobs:
           username: ec2-user
           key: ${{ secrets.EC2_SSH_KEY }} # pem 키
           script: |
+            echo "change permission"
             sudo su
+            echo "print working directory"
+            pwd
+            echo "docker pulling"
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/event-api:latest 
+            echo "docker-compose down"
             docker-compose down
-            docker-compose up -d --build
+            echo "docker-compose up"
+            docker-compose up -d 
 
