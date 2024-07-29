@@ -1,0 +1,11 @@
+
+services:
+  app:
+    build: .
+    ports:
+      - "80:80"
+    depends_on:
+      - db
+    environment:
+      SPRING_PROFILES_ACTIVE: 'default'
+
