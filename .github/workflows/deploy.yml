@@ -55,7 +55,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
-            sudo docker pull sonngu/event-api:latest
+            sudo docker pull soongu/event-api:latest
             docker-compose down
             docker rmi $(docker images -q)
             docker-compose up -d
