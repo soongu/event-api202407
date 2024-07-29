@@ -1,0 +1,44 @@
+name: Deploy Spring Application to AWS EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/event-api:latest
+
+      - name: Write the application.yml
+        run: |
+          echo "${{ secrets.APPLICATION_YML }}" | base64 -d > ./src/main/resources/application.yml
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.5.2
+        with:
+          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+
+      - name: Deploy to EC2
+        run: |
+          ssh -o "StrictHostKeyChecking=no" ec2-user@${{ secrets.EC2_HOST }} "docker pull ${{ secrets.DOCKERHUB_USERNAME }}/event-api:latest && docker-compose up -d"
