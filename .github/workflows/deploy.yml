@@ -41,6 +41,7 @@ jobs:
           username: ec2-user
           key: ${{ secrets.EC2_SSH_KEY }} # pem 키
           script: |
+            sudo su
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/event-api:latest 
             docker-compose down
             docker-compose up -d --build
