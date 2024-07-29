@@ -34,18 +34,17 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/event-api:latest
 
-      - name: Start SSH agent
-        run: |
-          eval "$(ssh-agent -s)"
-
-      - name: Add SSH key
-        env:
-          SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
-        run: |
-          mkdir -p ~/.ssh
-          echo "$SSH_KEY" | base64 --decode > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-add ~/.ssh/id_rsa
+      - name: Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }} # EC2 인스턴스 퍼블릭 DNS
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }} # pem 키
+          script: |
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/event-api:latest 
+            docker-compose down
+            docker-compose up -d 
+            docker-compose logs
 
       - name: Deploy to EC2
         run: |
