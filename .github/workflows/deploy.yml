@@ -43,6 +43,5 @@ jobs:
           script: |
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/event-api:latest 
             docker-compose down
-            docker-compose up -d 
-            docker-compose logs
+            docker-compose up -d --build
 
