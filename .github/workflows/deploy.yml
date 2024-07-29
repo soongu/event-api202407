@@ -32,7 +32,7 @@ jobs:
 
       - name: Write the application.yml
         run: |
-          echo "${{ secrets.APPLICATION_YML }}" | base64 -d > ./src/main/resources/application.yml
+          echo "${{ secrets.APPLICATION_YML }}" > ./src/main/resources/application.yml
 
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.5.2
