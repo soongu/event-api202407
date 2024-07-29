@@ -45,10 +45,10 @@ jobs:
             sudo su
             echo "print working directory"
             pwd
-            echo "docker pulling"
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/event-api:latest 
+            echo "git pulling"
+            git pull origin main 
             echo "docker-compose down"
             docker-compose down
             echo "docker-compose up"
-            docker-compose up -d 
+            docker-compose up -d --build
 
