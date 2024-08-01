@@ -45,7 +45,7 @@ jobs:
             echo "${{ secrets.DOCKER_COMPOSE_YML }}" > ./docker-compose.yml
             
             echo "Pulling Docker image..."
-            docker pull soongu/event-api:latest
+            docker-compose pull
             
             echo "Stopping existing container..."
             docker-compose down  
