@@ -45,10 +45,10 @@ jobs:
             echo "${{ secrets.DOCKER_COMPOSE_YML }}" > ./docker-compose.yml
             
             echo "Stopping existing container..."
-            docker-compose down  
+            docker-compose down || true
             
             echo "Remove Existing Docker image..."
-            docker rmi soongu/event-api:latest
+            docker rmi soongu/event-api:latest || true
             
             echo "Pulling Docker image..."
             docker pull soongu/event-api:latest
