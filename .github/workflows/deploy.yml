@@ -44,6 +44,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }}
             echo "Docker login..."
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
             
@@ -54,10 +55,10 @@ jobs:
             sudo docker pull soongu/event-api:${{ env.TAG }}
             
             echo "Stopping existing container..."
-            docker-compose down || true
+            docker-compose -f /home/ec2-user/docker-compose.yml down  # 기존 컨테이너 종료
             
             echo "Starting new container..."
-            docker-compose up -d
+            docker-compose -f /home/ec2-user/docker-compose.yml up -d # 새 컨테이너 시작
 
 #            echo "Stopping existing container..."
 #            docker stop event-api-container || true
