@@ -27,12 +27,6 @@ jobs:
         run: |
           echo "${{ secrets.DOCKER_COMPOSE_YML }}" > ./docker-compose.yml
 
-      - name: Build with Gradle
-        run: ./gradlew clean build
-
-      - name: Copy jar
-        run: cp ./build/libs/*.jar ./deploy/
-
       ## springboot 도커 이미지 빌드 후 도커허브에 push하기
       - name: web springboot docker build and push
         run: |
