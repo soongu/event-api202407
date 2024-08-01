@@ -23,6 +23,10 @@ jobs:
         run: |
           echo "${{ secrets.APPLICATION_YML }}" > ./src/main/resources/application.yml
 
+      - name: Write the docker-compose.yml
+        run: |
+          echo "${{ secrets.DOCKER_COMPOSE_YML }}" > ./docker-compose.yml
+
       - name: Build with Gradle
         run: ./gradlew clean build
 
@@ -36,7 +40,7 @@ jobs:
           docker build -t soongu/event-api:latest .
           docker push soongu/event-api:latest
 
-      # 도커 허브에서 jar파일 및 pull후에 컴포즈 up
+      # 도커 허브에서 jar파일 및 pull
       - name: Deploy to Dev
         uses: appleboy/ssh-action@master
         with:
@@ -48,8 +52,15 @@ jobs:
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
             echo "Pulling Docker image..."
             sudo docker pull soongu/event-api:latest
+            
             echo "Stopping existing container..."
-            docker stop event-api-container || true
-            docker rm event-api-container || true
+            docker-compose down || true
+            
             echo "Starting new container..."
-            docker run -d -p 80:80 --name event-api-container soongu/event-api:latest
+            docker-compose up -d
+
+#            echo "Stopping existing container..."
+#            docker stop event-api-container || true
+#            docker rm event-api-container || true
+#            echo "Starting new container..."
+#            docker run -d -p 80:80 --name event-api-container soongu/event-api:latest
