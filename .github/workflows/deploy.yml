@@ -27,8 +27,10 @@ jobs:
       - name: web springboot docker build and push
         run: |
           docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
-          docker build -t soongu/event-api:latest .
-          docker push soongu/event-api:latest
+          TAG=$(date +%Y%m%d%H%M%S)
+          docker build -t soongu/event-api:$TAG .
+          docker push soongu/event-api:$TAG
+          echo "TAG=$TAG" >> $GITHUB_ENV
 
       # 도커 허브에서 jar파일 및 pull
       - name: Deploy to Dev
@@ -40,6 +42,7 @@ jobs:
           script: |
             echo "Docker login..."
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
+            
             echo "Pulling Docker image..."
             sudo docker pull soongu/event-api:latest
             
