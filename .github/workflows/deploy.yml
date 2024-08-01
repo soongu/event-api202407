@@ -58,8 +58,7 @@ jobs:
             
             echo "Starting new container..."
             docker-compose -f /home/ec2-user/docker-compose.yml up -d # 새 컨테이너 시작
-          script_stop: true
-          ssh_args: "-o StrictHostKeyChecking=no"
+          
 
 #            echo "Stopping existing container..."
 #            docker stop event-api-container || true
