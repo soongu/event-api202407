@@ -44,7 +44,7 @@ jobs:
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
             
             echo "Pulling Docker image..."
-            sudo docker pull soongu/event-api:latest
+            sudo docker pull soongu/event-api:${{ env.TAG }}
             
             echo "Write the docker-compose.yml"
             echo "${{ secrets.DOCKER_COMPOSE_YML }}" > ./docker-compose.yml
