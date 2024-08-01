@@ -41,14 +41,17 @@ jobs:
             echo "Docker login..."
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
             
+            echo "Write the docker-compose.yml"
+            echo "${{ secrets.DOCKER_COMPOSE_YML }}" > ./docker-compose.yml
+            
             echo "Pulling Docker image..."
             docker pull soongu/event-api:latest
             
             echo "Stopping existing container..."
-            docker-compose -f /home/ec2-user/docker-compose.yml down  # 기존 컨테이너 종료
+            docker-compose down  
             
             echo "Starting new container..."
-            docker-compose -f /home/ec2-user/docker-compose.yml up -d # 새 컨테이너 시작
+            docker-compose up -d 
           
 
 #            echo "Stopping existing container..."
