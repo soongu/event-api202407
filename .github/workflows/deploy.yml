@@ -47,7 +47,7 @@ jobs:
             echo "Docker login..."
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
             
-            echo "Transferring docker-compose.yml..."
+            echo "Transferring docker-compose.yml...."
             scp docker-compose.yml ec2-user@${{ secrets.EC2_HOST }}:/home/ec2-user/docker-compose.yml
             
             echo "Pulling Docker image..."
