@@ -31,6 +31,10 @@ jobs:
           docker build -t soongu/event-api:$TAG .
           docker push soongu/event-api:$TAG
           echo "TAG=$TAG" >> $GITHUB_ENV
+          
+      - name: Prepare docker-compose.yml
+        run: |
+          echo "${{ secrets.DOCKER_COMPOSE_YML }}" | sed "s/{TAG}/${{ env.TAG }}/g" > docker-compose.yml
 
       # 도커 허브에서 jar파일 및 pull
       - name: Deploy to Dev
@@ -45,9 +49,6 @@ jobs:
             
             echo "Pulling Docker image..."
             sudo docker pull soongu/event-api:${{ env.TAG }}
-            
-            echo "Write the docker-compose.yml"
-            echo "${{ secrets.DOCKER_COMPOSE_YML }}" > ./docker-compose.yml
             
             echo "Stopping existing container..."
             docker-compose down || true
