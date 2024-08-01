@@ -44,8 +44,11 @@ jobs:
             echo "Write the docker-compose.yml"
             echo "${{ secrets.DOCKER_COMPOSE_YML }}" > ./docker-compose.yml
             
+            echo "Remove Existing Docker image..."
+            docker rmi soongu/event-api:latest
+            
             echo "Pulling Docker image..."
-            docker-compose pull
+            docker pull soongu/event-api:latest
             
             echo "Stopping existing container..."
             docker-compose down  
