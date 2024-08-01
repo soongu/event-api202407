@@ -23,10 +23,6 @@ jobs:
         run: |
           echo "${{ secrets.APPLICATION_YML }}" > ./src/main/resources/application.yml
 
-      - name: Write the docker-compose.yml
-        run: |
-          echo "${{ secrets.DOCKER_COMPOSE_YML }}" > ./docker-compose.yml
-
       ## springboot 도커 이미지 빌드 후 도커허브에 push하기
       - name: web springboot docker build and push
         run: |
@@ -46,6 +42,9 @@ jobs:
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
             echo "Pulling Docker image..."
             sudo docker pull soongu/event-api:latest
+            
+            echo "Write the docker-compose.yml"
+            echo "${{ secrets.DOCKER_COMPOSE_YML }}" > ./docker-compose.yml
             
             echo "Stopping existing container..."
             docker-compose down || true
