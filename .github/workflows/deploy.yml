@@ -27,14 +27,8 @@ jobs:
       - name: web springboot docker build and push
         run: |
           docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
-          TAG=$(date +%Y%m%d%H%M%S)
-          docker build -t soongu/event-api:$TAG .
-          docker push soongu/event-api:$TAG
-          echo "TAG=$TAG" >> $GITHUB_ENV
-          
-      - name: Prepare docker-compose.yml
-        run: |
-          echo "${{ secrets.DOCKER_COMPOSE_YML }}" | sed "s/{TAG}/${{ env.TAG }}/g" > docker-compose.yml
+          docker build --no-cache -t soongu/event-api:latest .
+          docker push soongu/event-api:latest
 
       # 도커 허브에서 jar파일 및 pull
       - name: Deploy to Dev
@@ -47,11 +41,8 @@ jobs:
             echo "Docker login..."
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
             
-            echo "Transferring docker-compose.yml...."
-            scp docker-compose.yml ec2-user@${{ secrets.EC2_HOST }}:/home/ec2-user/docker-compose.yml
-            
             echo "Pulling Docker image..."
-            docker pull soongu/event-api:${{ env.TAG }}
+            docker pull soongu/event-api:latest
             
             echo "Stopping existing container..."
             docker-compose -f /home/ec2-user/docker-compose.yml down  # 기존 컨테이너 종료
