@@ -23,6 +23,7 @@ jobs:
         run: |
           echo "${{ secrets.APPLICATION_YML }}" > ./src/main/resources/application.yml
 
+
       ## springboot 도커 이미지 빌드 후 도커허브에 push하기
       - name: web springboot docker build and push
         run: |
